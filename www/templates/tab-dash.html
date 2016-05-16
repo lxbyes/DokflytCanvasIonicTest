@@ -1,0 +1,47 @@
+<ion-view view-title="Dashboard">
+  <ion-content class="padding" scroll="false">
+    <div id="sketch">
+      <div class="dashboard">
+        <div class="paint-ctl">
+          <div class="brush-ctl"><i class="fa fa-paint-brush"></i></div>
+          <div class="mark-ctl"><i class="fa fa-smile-o"></i></div>
+          <div class="eraser-ctl" style="display: none"><i class="fa fa-eraser"></i></div>
+          <div class="clear-ctl" data-op='clear' style="display: none"><i class="fa fa-trash-o"></i></div>
+          <div class="undo-ctl" data-op='undo' style="display: none"><i class="fa fa-undo"></i></div>
+          <div class="save-ctl" data-op='save' style="display: none"><i class="fa fa-floppy-o"></i></div>
+        </div>
+        <div class="brush" style="display: none">
+          <!--<i class="fa fa-picture-o picture" data-op='picture'>
+              <input type="file" accept="image/*" style="display: none; visibility: hidden;">
+          </i>-->
+          <i id="default-tool" class="fa fa-pencil paint" data-op='pencil'></i>
+          <i class="fa fa-square-o paint" data-op='rect'></i>
+          <i class="fa fa-circle-o paint" data-op='ellipse'></i>
+          <i class="fa fa-arrow-right paint" data-op='arrow'></i>
+        </div>
+        <div class="size" style="display: none">
+          <i class="fa fa-circle xs" data-size="2"></i>
+          <i class="fa fa-circle sm" data-size="4"></i>
+          <i class="fa fa-circle md" data-size="6"></i>
+          <i class="fa fa-circle lg" data-size="8"></i>
+        </div>
+        <div class="color" style="display: none">
+          <i class="bg-black" data-color="#000" data-mark="1"></i>
+          <i class="bg-white" data-color="#fff" data-mark="2"></i>
+          <i class="bg-red" data-color="#ff3300" data-mark="3"></i>
+          <i class="bg-green" data-color="#00cc66" data-mark="4"></i>
+          <i class="bg-blue" data-color="#0066ff" data-mark="5"></i>
+          <i class="bg-yellow" data-color="#ffff66" data-mark="6"></i>
+        </div>
+        <div class="mark-box" style="display: none">
+          <img class="active" src="images/mark/mark_1_3.png" data-mark="1"/>
+          <img src="images/mark/mark_2_3.png" data-mark="2"/>
+          <img src="images/mark/mark_3_3.png" data-mark="3"/>
+          <img src="images/mark/mark_4_3.png" data-mark="4"/>
+          <img src="images/mark/mark_5_3.png" data-mark="5"/>
+          <img src="images/mark/mark_6_3.png" data-mark="6"/>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>
