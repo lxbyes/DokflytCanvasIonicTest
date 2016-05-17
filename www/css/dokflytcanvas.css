@@ -12,8 +12,8 @@ html, body {
 
 .dashboard {
 	position: relative;
-	top: 0;
-	right: 10px;
+	top: 10px;
+	right: 15px;
 	z-index: 10;
 }
 .dashboard i {
@@ -23,6 +23,9 @@ html, body {
     	1px -1px 0 #333,
     	-1px 1px 0 #333,
     	1px 1px 0 #333;
+}
+.bg-layer {
+	background: #000;
 }
 
 /* Paint control */
@@ -55,10 +58,10 @@ html, body {
 	right: 120px;
 }
 .save-ctl {
-	left: 20px;
+	left: 30px;
 }
 .clear-ctl {
-	left: 60px;
+	left: 70px;
 }
 
 /* Mark */
@@ -113,9 +116,8 @@ html, body {
     outline: 1px solid #333;
 }
 .color i {
-	width: 30px;
-	height: 30px;
-	line-height: 30px;
+	width: 26px;
+	height: 26px;
 	display: block;
 }
 .color i:last-child {
@@ -171,4 +173,7 @@ html, body {
 }
 .bg-yellow {
 	background-color: #ff6;
+}
+.bg-gray {
+	background-color: #333;
 }
