@@ -674,7 +674,7 @@ var Dokflytcanvas = function(selector, bgImg, uiImg) {
         // TODO: improve
         if(currentTool === paintTools['mark']) {
             var cur = document.querySelector('.mark-box img.active');
-            cur.src = '../images/mark/mark_' + cur.getAttribute('data-mark') + '_' + this.getAttribute('data-mark') + '.png';
+            cur.src = 'assets/images/mark/mark_' + cur.getAttribute('data-mark') + '_' + this.getAttribute('data-mark') + '.png';
         }
     };
     
@@ -864,10 +864,10 @@ var Dokflytcanvas = function(selector, bgImg, uiImg) {
                 bgScale = screenWidth / screenHeight;
                 oriScale = oriWidth / oriHeight;
                 if (bgScale > oriScale) {
-                    width = (screenHeight - t) * oriScale;
-                    height = (screenHeight - t);
+                    width = screenHeight * oriScale;
+                    height = screenHeight;
                     top = 0;
-                    left = screenWidth / 2 - (screenHeight - t) * oriScale / 2;
+                    left = screenWidth / 2 - screenHeight * oriScale / 2;
                 } else {
                     width = screenWidth;
                     height = screenWidth / oriScale;
