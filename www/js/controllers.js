@@ -1,7 +1,8 @@
 angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function($scope) {
-  Dokflytcanvas(113,"#sketch", "history/swan.jpg");
+  // when test: android 113, bug ios 69
+  var dok = Dokflytcanvas("#sketch", "history/swan.jpg");
 })
 
 .controller('ChatsCtrl', function($scope, Chats) {

@@ -1,54 +1,52 @@
 'use strict';
 
-var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
-
+var Dokflytcanvas = function(selector, bgImg, uiImg) {
+    
     var face = {};
-
+    
     var DEFAULT_SIZE = 4, DEFAULT_COLOR = '#ff3300';
-
-    if(!t) {
-        t = 0;
-    }
-
+    
     function getComputedLength(str) {
         return parseInt(str.substring(0, str.length - 2));
     }
-
+        
     // set canvas size, equal to parent
-    function setCanvasSize(canvas, parent) {
+    function setCanvasSize(canvas, parent) {        
         var parentStyle = getComputedStyle(parent);
         canvas.width = getComputedLength(parentStyle.width);
         canvas.height = getComputedLength(parentStyle.height);
     }
-
+    
     function getX(e) {
+        var rect = e.target.getBoundingClientRect();
         if(e.clientX) {
-            return e.clientX;
+            return e.clientX - rect.left;
         }
         if(e.touches && e.touches.length > 0) {
-            return e.touches[0].clientX;
+            return e.touches[0].clientX - rect.left;
         }
         if(e.changedTouches && e.changedTouches.length > 0) {
-            return e.changedTouches[0].clientX;
+            return e.changedTouches[0].clientX - rect.left;
         }
         // assert not excute
         return 0;
     };
-
+    
     function getY(e) {
+        var rect = e.target.getBoundingClientRect();
         if(e.clientY) {
-            return e.clientY;
+            return e.clientY - rect.top;
         }
         if(e.touches && e.touches.length > 0) {
-            return e.touches[0].clientY;
+            return e.touches[0].clientY - rect.top;
         }
         if(e.changedTouches && e.changedTouches.length > 0) {
-            return e.changedTouches[0].clientY;
+            return e.changedTouches[0].clientY - rect.top;
         }
         // assert not excute
         return 0;
     };
-
+    
     var Pencil = function(uiCtx, paintCtx) {
         var start = {};
         var linePoints = [];
@@ -58,40 +56,40 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             onPaintStart: function(e) {
                 start.painting = true;
                 start.painted = false;
-                start.x = getX(e) - toLeft;
-                start.y = getY(e) - toTop;
+                start.x = getX(e);
+                start.y = getY(e);
                 paintCtx.strokeStyle = this.color;
                 paintCtx.lineWidth = this.size;
                 uiCtx.strokeStyle = this.color;
                 uiCtx.lineWidth = this.size;
                 // Hide dashboard
-                document.querySelector('.dashboard').style.display = 'none';
+                document.querySelector('.dashboard').style.display = 'none';         
             },
             onPaint: function(e) {
                 if(start.painting) {
                     start.painted = true;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
-
+                    var x = getX(e);
+                    var y = getY(e);
+                    
                     linePoints.push({x: x, y: y});
                     // Reset each time
-                    paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+                    paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);  
                     paintCtx.beginPath();
-                    paintCtx.moveTo(start.x, start.y);
+                    paintCtx.moveTo(start.x, start.y);              
                     for(var i in linePoints) {
                         var point = linePoints[i];
                         paintCtx.lineTo(point.x, point.y);
                     }
-                    paintCtx.stroke();
+                    paintCtx.stroke();             
                 }
             },
             onPaintEnd: function(e) {
                 if(start.painting && start.painted) {
                     start.painting = false;
                     start.painted = false;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
-
+                    var x = getX(e);
+                    var y = getY(e);            
+                    
                     paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
                     uiCtx.beginPath();
                     uiCtx.moveTo(start.x, start.y);
@@ -103,20 +101,20 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                     // Reset data
                     linePoints.length = 0;
                     cloneToStack();
-
+                    
                     // Show tools: eraser, undo, clear, save
                     document.querySelector('.eraser-ctl').style.display = 'block';
-                    document.querySelector('.undo-ctl').style.display = 'block';
+                    document.querySelector('.undo-ctl').style.display = 'block'; 
                     document.querySelector('.clear-ctl').style.display = 'block';
-                    document.querySelector('.save-ctl').style.display = 'block';
-                }
+                    document.querySelector('.save-ctl').style.display = 'block';              
+                } 
                 // Show dashboard
                 document.querySelector('.dashboard').style.display = 'block';
             }
         };
         return obj;
     };
-
+    
     var Rect = function(uiCtx, paintCtx) {
         var start = {};
         var obj = {
@@ -125,8 +123,8 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             onPaintStart: function(e) {
                 start.painting = true;
                 start.painted = false;
-                start.x = getX(e) - toLeft;
-                start.y = getY(e) - toTop;
+                start.x = getX(e);
+                start.y = getY(e);
                 paintCtx.strokeStyle = this.color;
                 paintCtx.lineWidth = this.size;
                 uiCtx.strokeStyle = this.color;
@@ -137,10 +135,10 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             onPaint: function(e) {
                 if(start.painting) {
                     start.painted = true;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
+                    var x = getX(e);
+                    var y = getY(e);
                     // Reset each time
-                    paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+                    paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);                    
                     paintCtx.strokeRect(start.x, start.y, x - start.x, y - start.y);
                 }
             },
@@ -148,26 +146,26 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                 if(start.painting && start.painted) {
                     start.painting = false;
                     start.painted = false;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
-
+                    var x = getX(e);
+                    var y = getY(e);            
+                    
                     paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
                     uiCtx.strokeRect(start.x, start.y, x - start.x, y - start.y);
                     cloneToStack();
-
+                    
                     // Show tools: eraser, undo, clear, save
                     document.querySelector('.eraser-ctl').style.display = 'block';
-                    document.querySelector('.undo-ctl').style.display = 'block';
+                    document.querySelector('.undo-ctl').style.display = 'block'; 
                     document.querySelector('.clear-ctl').style.display = 'block';
                     document.querySelector('.save-ctl').style.display = 'block';
-                }
+                } 
                 // Show dashboard
                 document.querySelector('.dashboard').style.display = 'block';
             }
         };
         return obj;
     };
-
+    
     var Ellipse = function(uiCtx, paintCtx) {
         var start = {};
         var obj = {
@@ -176,8 +174,8 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             onPaintStart: function(e) {
                 start.painting = true;
                 start.painted = false;
-                start.x = getX(e) - toLeft;
-                start.y = getY(e) - toTop;
+                start.x = getX(e);
+                start.y = getY(e);
                 paintCtx.strokeStyle = this.color;
                 paintCtx.lineWidth = this.size;
                 uiCtx.strokeStyle = this.color;
@@ -188,11 +186,11 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             onPaint: function(e) {
                 if(start.painting) {
                     start.painted = true;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
+                    var x = getX(e);
+                    var y = getY(e);
                     // Reset each time
                     paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-                    paintCtx.save();
+                    paintCtx.save();                    
                     var a = Math.abs(x - start.x) / 2, b = Math.abs(y - start.y) / 2;
                     var r = (a > b) ? a : b;
                     var ratioX = a / r; //horizontal axis scaling ratio
@@ -206,19 +204,19 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                     paintCtx.arc(centerX / ratioX, centerY / ratioY, r, 0, 2 * Math.PI);
                     paintCtx.closePath();
                     paintCtx.stroke();
-                    paintCtx.restore();
+                    paintCtx.restore();  
                 }
             },
             onPaintEnd: function(e) {
                 if(start.painting && start.painted) {
                     start.painting = false;
                     start.painted = false;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
-
+                    var x = getX(e);
+                    var y = getY(e);            
+                    
                     // reset
                     paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
-                    uiCtx.save();
+                    uiCtx.save();                    
                     var a = Math.abs(x - start.x) / 2, b = Math.abs(y - start.y) / 2;
                     var r = (a > b) ? a : b;
                     var ratioX = a / r; //horizontal axis scaling ratio
@@ -234,20 +232,20 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                     uiCtx.stroke();
                     uiCtx.restore();
                     cloneToStack();
-
+                    
                     // Show tools: eraser, undo, clear, save
                     document.querySelector('.eraser-ctl').style.display = 'block';
-                    document.querySelector('.undo-ctl').style.display = 'block';
+                    document.querySelector('.undo-ctl').style.display = 'block'; 
                     document.querySelector('.clear-ctl').style.display = 'block';
                     document.querySelector('.save-ctl').style.display = 'block';
-                }
+                } 
                 // Show dashboard
                 document.querySelector('.dashboard').style.display = 'block';
             }
         };
         return obj;
     };
-
+    
     var Arrow = function(uiCtx, paintCtx) {
         var start = {};
         var drawArrow = function(ctx, x0, y0, x1, y1) {
@@ -261,7 +259,7 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             ctx.moveTo(x0, y0);
             ctx.lineTo(x1, y1);
             ctx.stroke();
-
+                                
             ctx.save();
             // the angle to x axis
             var ang = Math.atan(Math.abs(y1 - y0)/Math.abs(x1 - x0));
@@ -276,7 +274,7 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             } else if(x1 <= x0 && y1 >= y0) {
                 ctx.rotate(Math.PI - ang);
             }
-            // draw the arrow head
+            // draw the arrow head        
             ctx.beginPath();
             ctx.moveTo(ctx.lineWidth + 2, 0);
             ctx.lineTo(-ctx.lineWidth * 4, ctx.lineWidth * 2);
@@ -290,8 +288,8 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             onPaintStart: function(e) {
                 start.painting = true;
                 start.painted = false;
-                start.x = getX(e) - toLeft;
-                start.y = getY(e) - toTop;
+                start.x = getX(e);
+                start.y = getY(e);
                 paintCtx.strokeStyle = this.color;
                 paintCtx.fillStyle = this.color;
                 paintCtx.lineWidth = this.size;
@@ -299,13 +297,13 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                 uiCtx.fillStyle = this.color;
                 uiCtx.lineWidth = this.size;
                 // Hide dashboard
-                document.querySelector('.dashboard').style.display = 'none';
+                document.querySelector('.dashboard').style.display = 'none';       
             },
             onPaint: function(e) {
                 if(start.painting) {
                     start.painted = true;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
+                    var x = getX(e);
+                    var y = getY(e);
                     // Reset each time
                     paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
                     drawArrow(paintCtx, start.x, start.y, x, y);
@@ -315,27 +313,27 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                 if(start.painting && start.painted) {
                     start.painting = false;
                     start.painted = false;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
-
+                    var x = getX(e);
+                    var y = getY(e);            
+                    
                     // reset
                     paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
                     drawArrow(uiCtx, start.x, start.y, x, y);
                     cloneToStack();
-
+                   
                     // Show tools: eraser, undo, clear, save
                     document.querySelector('.eraser-ctl').style.display = 'block';
-                    document.querySelector('.undo-ctl').style.display = 'block';
+                    document.querySelector('.undo-ctl').style.display = 'block'; 
                     document.querySelector('.clear-ctl').style.display = 'block';
                     document.querySelector('.save-ctl').style.display = 'block';
-                }
+                } 
                 // Show dashboard
                 document.querySelector('.dashboard').style.display = 'block';
             }
         };
         return obj;
     };
-
+    
     var Eraser = function(uiCtx) {
         var start = {};
         var lastPoint = {};
@@ -345,19 +343,19 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             onPaintStart: function(e) {
                 start.painting = true;
                 start.painted = false;
-                lastPoint.x = start.x = getX(e) - toLeft;
-                lastPoint.y = start.y = getY(e) - toTop;
+                lastPoint.x = start.x = getX(e);
+                lastPoint.y = start.y = getY(e);
                 uiCtx.strokeStyle = this.color;
                 uiCtx.lineWidth = this.size;
-                uiCtx.globalCompositeOperation = 'destination-out';
+                uiCtx.globalCompositeOperation = 'destination-out'; 
                 // Hide dashboard
-                document.querySelector('.dashboard').style.display = 'none';
+                document.querySelector('.dashboard').style.display = 'none';   
             },
             onPaint: function(e) {
                 if(start.painting) {
                     start.painted = true;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
+                    var x = getX(e);
+                    var y = getY(e);
                     uiCtx.beginPath();
                     uiCtx.moveTo(lastPoint.x, lastPoint.y);
                     uiCtx.lineTo(x, y);
@@ -368,19 +366,19 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             },
             onPaintEnd: function(e) {
                 if(start.painting && start.painted) {
-                    start.painting = false;
-                    start.painted = false;
+                    start.painting = false;  
+                    start.painted = false;  
                     // recover
                     uiCtx.globalCompositeOperation = 'source-over';
-                    cloneToStack();
-                }
+                    cloneToStack();                                                                                        
+                } 
                 // Show dashboard
                 document.querySelector('.dashboard').style.display = 'block';
             }
         };
         return obj;
     };
-
+    
     var MarkPanel = function(uiCtx, paintCtx) {
         var start = {};
         var obj = {
@@ -389,31 +387,31 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             onPaintStart: function(e) {
                 start.painting = true;
                 start.painted = false;
-                start.x = getX(e) - toLeft;
-                start.y = getY(e) - toTop;
+                start.x = getX(e);
+                start.y = getY(e);
                 // Hide dashboard
                 document.querySelector('.dashboard').style.display = 'none';
             },
             onPaint: function(e) {
                 if(start.painting) {
                     start.painted = true;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
+                    var x = getX(e);
+                    var y = getY(e);
                     // Reset each time
                     paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
                     var w = x - start.x;
                     var h = y - start.y;
                     var mark = document.querySelector('.mark-box img.active');
-                    paintCtx.drawImage(mark, start.x, start.y, w, h);
+                    paintCtx.drawImage(mark, start.x, start.y, w, h); 
                 }
             },
             onPaintEnd: function(e) {
                 if(start.painting && start.painted) {
                     start.painting = false;
                     start.painted = false;
-                    var x = getX(e) - toLeft;
-                    var y = getY(e) - toTop;
-
+                    var x = getX(e);
+                    var y = getY(e);            
+                    
                     // reset
                     paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
                     var w = x - start.x;
@@ -421,25 +419,25 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                     var mark = document.querySelector('.mark-box img.active');
                     uiCtx.drawImage(mark, start.x, start.y, w, h);
                     cloneToStack();
-
+                    
                     // Show tools: eraser, undo, clear, save
                     document.querySelector('.eraser-ctl').style.display = 'block';
-                    document.querySelector('.undo-ctl').style.display = 'block';
+                    document.querySelector('.undo-ctl').style.display = 'block'; 
                     document.querySelector('.clear-ctl').style.display = 'block';
                     document.querySelector('.save-ctl').style.display = 'block';
-                }
+                } 
                 // Show dashboard
                 document.querySelector('.dashboard').style.display = 'block';
             }
         };
         return obj;
     };
-
+    
     var screenWidth = window.innerWidth;
     var screenHeight = window.innerHeight;
 
-    var oriWidth, oriHeight, bgScale, oriScale, toLeft, toTop;
-
+    var oriWidth, oriHeight, bgScale, oriScale;
+        
     var sketch = document.querySelector(selector);
 
     var bgCanvas = document.createElement('canvas');
@@ -449,8 +447,8 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
     var bgCtx = bgCanvas.getContext('2d');
     var uiCtx = uiCanvas.getContext('2d');
     var paintCtx = paintCanvas.getContext('2d');
-
-    var paintTools = {};
+    
+    var paintTools = {};    
     paintTools['rect'] = Rect(uiCtx, paintCtx);
     paintTools['pencil'] = Pencil(uiCtx, paintCtx);
     paintTools['ellipse'] = Ellipse(uiCtx, paintCtx);
@@ -464,8 +462,6 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
     var stack = new Array();
 
     var defineSize = function(width, height, top, left) {
-        toLeft = left;
-        toTop = top + t;
         // UI layer
         uiCanvas.classList.add('ui-layer');
         uiCanvas.width = width;
@@ -483,21 +479,21 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
         paintCanvas.style.left = left.toString() + 'px';
         paintCanvas.style.zIndex = 3;
         paintCanvas.style.cursor = 'crosshair';
-
+        
         // add to sketch
         sketch.appendChild(bgCanvas);
         sketch.appendChild(uiCanvas);
         sketch.appendChild(paintCanvas);
     }
-
+    
     var cloneToStack = function() {
         var c = document.createElement('canvas');
         c.width = uiCanvas.width;
-        c.height = uiCanvas.height;
+        c.height = uiCanvas.height;  
         c.getContext('2d').drawImage(uiCanvas, 0, 0, c.width, c.height);
         stack.push(c);
     };
-
+    
     var backToLastCanvas = function() {
         // clear the ui canvas
         uiCanvas.width = uiCanvas.width;
@@ -513,14 +509,14 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             document.querySelector('.color').style.display = 'none';
             document.querySelector('.brush').style.display = 'none';
             return;
-        }
+        }        
         var canvas = stack[stack.length - 1];
-        if(canvas) {
+        if(canvas) {            
             // repaint the canvas
             uiCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
-        }
+        }        
     };
-
+    
     var selectTool = function(selector, dom) {
         if(paintTools[selector]) {
             currentTool = paintTools[selector];
@@ -531,21 +527,21 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
         } else {
             currentTool = null;
         }
-    };
-
+    };    
+    
     var pickColor = function(color) {
         if(currentTool) {
-            currentTool.color = color;
+            currentTool.color = color;           
         }
         resetColor(color);
     };
-
+    
     var changePaintToolSize = function(size) {
         if(currentTool) {
             currentTool.size = size;
         }
     };
-
+    
     var activeSizeButton = function(size) {
         if(!size) {
             return;
@@ -557,15 +553,15 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                 resetActive(sizeBtns[i]);
                 return;
             }
-        }
-        resetColor(currentTool.color);
-    };
-
+        }   
+        resetColor(currentTool.color);     
+    };   
+    
     var resetActive = function(item) {
         if(item) {
             var parent = item.parentNode;
             if(parent) {
-                var oldActive = parent.querySelector('.active');
+                var oldActive = parent.querySelector('.active');                
                 if(oldActive) {
                     oldActive.classList.remove('active');
                 }
@@ -574,7 +570,7 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
         }
         resetColor(currentTool.color);
     };
-
+    
     var resetColor = function(color) {
         for(var i = 0; i< brushButtons.length; i++) {
             var brushBtn = brushButtons[i];
@@ -597,7 +593,7 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
     // Paint controllers
     var onCtrlClick = function() {
         var that = this;
-
+            
         if(that.className.indexOf('brush-ctl') !== -1) {
             var dom = document.querySelector('.dashboard .brush i.active');
             selectTool(dom.getAttribute('data-op'));
@@ -610,13 +606,13 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             document.querySelector('.mark-box').style.display = 'none';
             document.querySelector('.color').style.display = 'none';
             document.querySelector('.brush').style.display = 'none';
-            document.querySelector('.size').style.display = 'block';
+            document.querySelector('.size').style.display = 'block';          
         } else if(that.className.indexOf('undo-ctl') !== -1) {
             // undo
             backToLastCanvas();
         } else if(that.className.indexOf('picture') !== -1) {
             var fileInput = that.querySelector('input[type="file"]');
-            fileInput.click();
+            fileInput.click();           
         } else if(that.className.indexOf('save-ctl') !== -1) {
             saveAsImage();
         } else if(that.className.indexOf('clear-ctl') !== -1) {
@@ -642,11 +638,11 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
     // click on brush
     var onBrushClick = function() {
         var that = this;
-
+            
         if(that.className.indexOf('paint') !== -1) {
             selectTool(that.getAttribute('data-op'), that);
             document.querySelector('.size').style.display = 'block';
-            document.querySelector('.color').style.display = 'block';
+            document.querySelector('.color').style.display = 'block';           
         } else if(that.className.indexOf('eraser') !== -1) {
             selectTool(that.getAttribute('data-op'), that);
             document.querySelector('.size').style.display = 'block';
@@ -656,7 +652,7 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             backToLastCanvas();
         } else if(that.className.indexOf('picture') !== -1) {
             var fileInput = that.querySelector('input[type="file"]');
-            fileInput.click();
+            fileInput.click();           
         } else if(that.className.indexOf('save') !== -1) {
             saveAsImage();
         } else if(that.className.indexOf('clear') !== -1) {
@@ -664,37 +660,37 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             stack.length = 0;
         }
     };
-
+       
     // click on size
     var onSizeClick = function() {
         var that = this;
         resetActive(that);
         changePaintToolSize(parseInt(that.getAttribute('data-size')));
     };
-
+    
     var onColorPanelClick = function(e) {
         var color = this.getAttribute('data-color');
         pickColor(color);
         // TODO: improve
         if(currentTool === paintTools['mark']) {
             var cur = document.querySelector('.mark-box img.active');
-            cur.src = 'assets/images/mark/mark_' + cur.getAttribute('data-mark') + '_' + this.getAttribute('data-mark') + '.png';
+            cur.src = '../images/mark/mark_' + cur.getAttribute('data-mark') + '_' + this.getAttribute('data-mark') + '.png';
         }
     };
-
+    
     var drawImage = function(img) {
         if(img) {
             // clear the data
             bgCanvas.width = bgCanvas.width;
             bgCtx.drawImage(img, 0, 0, bgCanvas.width, bgCanvas.height);
-        }
+        }        
     };
-
-    var saveAsImage = function() {
+        
+    var saveAsImage = function() {       
         //paintCtx.width = paintCtx.width;
         //paintCtx.drawImage(bgCanvas, 0, 0, bgCanvas.width, bgCanvas.height);
         //paintCtx.drawImage(uiCanvas, 0, 0, uiCanvas.width, uiCanvas.height);
-
+                
         // save and download original image + canvas image (as jpeg)
         //var all = document.createElement('a');
         //all.href = paintCanvas.toDataURL('image/jpeg');
@@ -734,7 +730,7 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
         // return canvas image base64 code
         return uiLayer.toDataURL();
     };
-
+    
     var dashboard = {
         isHidden: false,
         toggle: function() {
@@ -747,27 +743,27 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
             }
         }
     };
-
+    
     var init = function() {
         // when init, select the default tool
         selectTool('pencil', document.getElementById('default-tool'));
         for(var i = 0; i < paintCtrls.length; i++) {
             paintCtrls[i].addEventListener('click', onCtrlClick, false);
-        }
+        } 
 
         for(var i = 0; i < brushButtons.length; i++) {
             brushButtons[i].addEventListener('click', onBrushClick, false);
-        }
-
+        }    
+    
         for(var i = 0; i < sizeButtons.length; i++) {
             sizeButtons[i].addEventListener('click', onSizeClick, false);
         }
-
+        
         var colorBtns = document.querySelectorAll('.dashboard .color i');
         for(var i = 0; i < colorBtns.length; i ++) {
             colorBtns[i].addEventListener('click', onColorPanelClick, false);
         }
-
+        
         var markImgs = document.querySelectorAll('.mark-box img');
         for(var i = 0; i < markImgs.length; i ++) {
             markImgs[i].addEventListener('click', function() {
@@ -775,7 +771,7 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                 this.classList.add('active');
             }, false);
         }
-
+        
         //document.querySelector('.dashboard .brush input[type="file"]').addEventListener('change', function(e) {
         //    var that = this;
         //    var files = that.files;
@@ -787,59 +783,59 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
         //            img.src = e.target.result;
         //            img.onload = function() {
         //                drawImage(img);
-        //            };
+        //            };                   
         //        }
         //        reader.readAsDataURL(file);
         //    }
         //}, false);
-
+        
         // event cycle, add to paint canvas
         paintCanvas.addEventListener('mousedown', function(e) {
             e.preventDefault();
             if(currentTool) {
                 currentTool.onPaintStart(e);
                 paintCanvas.style.zIndex = 6;
-            }
+            }        
         });
-
+           
         paintCanvas.addEventListener('mousemove', function(e) {
             e.preventDefault();
             if(currentTool) {
-                currentTool.onPaint(e);
+                currentTool.onPaint(e); 
             }
         });
-
+        
         paintCanvas.addEventListener('mouseup', function(e) {
             e.preventDefault();
             if(currentTool) {
                 currentTool.onPaintEnd(e);
-                paintCanvas.style.zIndex = 3;
-            }
+                paintCanvas.style.zIndex = 3;   
+            }    
         });
-
+    
         paintCanvas.addEventListener('mouseout', function(e) {
             e.preventDefault();
             if(currentTool) {
                 currentTool.onPaintEnd(e);
                 paintCanvas.style.zIndex = 3;
-            }
+            } 
         });
-
+        
         paintCanvas.addEventListener('touchstart', function(e) {
             e.preventDefault();
             if(currentTool) {
                 currentTool.onPaintStart(e);
                 paintCanvas.style.zIndex = 6;
-            }
+            }        
         });
-
+        
         paintCanvas.addEventListener('touchmove', function(e) {
             e.preventDefault();
             if(currentTool) {
-                currentTool.onPaint(e);
+                currentTool.onPaint(e); 
             }
         });
-
+    
         paintCanvas.addEventListener('touchend', function(e) {
             e.preventDefault();
             if(currentTool) {
@@ -847,15 +843,15 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                 paintCanvas.style.zIndex = 3;
             }
         });
-
+           
         paintCanvas.addEventListener('touchcancel', function(e) {
             e.preventDefault();
             if(currentTool) {
                 currentTool.onPaintEnd(e);
                 paintCanvas.style.zIndex = 3;
-            }
+            }  
         });
-
+           
         bgCtx.fillStyle = 'transparent';
         bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
         if(bgImg) {
@@ -865,7 +861,7 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                 var width, height, top, left;
                 oriWidth = oriImg.width;
                 oriHeight = oriImg.height;
-                bgScale = screenWidth / (screenHeight - t);
+                bgScale = screenWidth / screenHeight;
                 oriScale = oriWidth / oriHeight;
                 if (bgScale > oriScale) {
                     width = (screenHeight - t) * oriScale;
@@ -875,7 +871,7 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
                 } else {
                     width = screenWidth;
                     height = screenWidth / oriScale;
-                    top = (screenHeight - t) / 2 - screenWidth / oriScale / 2;
+                    top = screenHeight / 2 - screenWidth / oriScale / 2;
                     left = 0;
                 }
                 bgCanvas.classList.add('bg-layer');
@@ -903,6 +899,6 @@ var Dokflytcanvas = function(t, selector, bgImg, uiImg) {
         }
     };
     init();
-
+    
     return face;
 };
